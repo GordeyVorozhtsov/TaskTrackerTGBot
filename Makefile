@@ -62,8 +62,11 @@ beget-logs: ## логи app на Beget
 beget-deploy: ## деплoy VPS (Docker)
 	bash scripts/deploy-beget.sh
 
-beget-native-deploy: ## деплой shared Beget (venv, без Docker)
+beget-native-deploy: ## деплой shared Beget (pip --user, без Docker/venv)
 	bash scripts/deploy-beget-native.sh
 
 beget-native-stop: ## остановить native-процесс
 	bash scripts/stop-beget-native.sh
+
+beget-check: ## проверка окружения Beget shared
+	bash scripts/check-beget.sh
