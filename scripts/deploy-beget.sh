@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Деплой / обновление на Beget VPS. Запускать из корня репозитория на сервере.
+# Деплой на Beget VPS (Docker). На shared-хостинге Docker недоступен — используйте deploy-beget-native.sh
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -9,6 +9,21 @@ COMPOSE="docker compose --env-file .env -f deploy/docker-compose.beget.yml"
 
 if [[ ! -f .env ]]; then
   echo "Нет .env. Скопируйте шаблон: cp .env.beget.example .env && nano .env"
+  exit 1
+fi
+
+if ! docker info >/dev/null 2>&1; then
+  echo "Docker недоступен для текущего пользователя."
+  echo ""
+  echo "Вариант A — shared Beget (mayday), без Docker:"
+  echo "  bash scripts/deploy-beget-native.sh"
+  echo ""
+  echo "Вариант B — VPS, выдать права Docker:"
+  echo "  sudo usermod -aG docker \$USER"
+  echo "  # перелогиниться по SSH, затем снова bash scripts/deploy-beget.sh"
+  echo ""
+  echo "Вариант C — разово через sudo:"
+  echo "  sudo docker compose --env-file .env -f deploy/docker-compose.beget.yml up -d --build"
   exit 1
 fi
 
