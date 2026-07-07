@@ -1,0 +1,25 @@
+# Beget / production: только приложение, MySQL — в панели Beget (DATABASE_URL).
+# MySQL на том же сервере: в DATABASE_URL используйте host.docker.internal (не localhost!).
+# Запуск: make beget-up
+
+services:
+  app:
+    build: ../backend
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      DATA_DIR: /data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    volumes:
+      - ../frontend:/app/frontend:ro
+      - ../data:/data
