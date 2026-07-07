@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+.env
+.venv/
+venv/
+backend/.venv/
+
+# Runtime data
+data/logs/*
+data/uploads/*
+data/backups/*
+!data/**/.gitkeep
+
+# Legacy paths (до перехода на data/)
+logs/
+uploads/
+snapshots/
+
+*.log
+.DS_Store
+.idea/
+.vscode/
