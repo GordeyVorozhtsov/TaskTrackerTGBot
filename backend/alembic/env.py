@@ -9,7 +9,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.core.config import Settings
-from app.infra.database import Base, engine_options
+from app.infra.database import Base, alembic_engine_options
 from app.models import (  # noqa: F401 — register metadata
     Board,
     BoardMember,
@@ -54,7 +54,7 @@ async def run_async_migrations() -> None:
     connectable = create_async_engine(
         settings.async_database_url,
         poolclass=pool.NullPool,
-        **engine_options(settings),
+        **alembic_engine_options(settings),
     )
 
     async with connectable.connect() as connection:

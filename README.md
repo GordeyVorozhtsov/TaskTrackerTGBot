@@ -111,21 +111,17 @@ CORS_ORIGINS=https://your-domain.com
 
 При `ENV=production` приложение **не запустится**, если `DEBUG=true`, нет `BOT_TOKEN`, слабый пароль БД, `WEBAPP_URL` без HTTPS или `CORS_ORIGINS=*`.
 
-## Beget (VPS + MySQL)
-
-На VPS поднимается только приложение. MySQL — в панели Beget (раздел «MySQL»).
-
-```env
-DATABASE_URL=mysql://user:password@host.beget.tech:3306/dbname
-BOT_TOKEN=...
-WEBAPP_URL=https://your-domain.com
-ENV=production
-DEBUG=false
-```
+## Beget shared (mayday, без Docker)
 
 ```bash
-docker compose -f deploy/docker-compose.yml up -d --build app
+cp .env.beget.example .env && nano .env
+bash scripts/deploy-beget-native.sh          # запуск
+bash scripts/deploy-beget-native.sh stop     # остановка
 ```
+
+`.env` на сервере: `DATABASE_URL=mysql://gvoroz2u_db:ПАРОЛЬ@localhost:3306/gvoroz2u_db`, `WEBAPP_URL=https://...`, `ENV=production`.
+
+## Beget VPS (Docker + внешний MySQL)
 
 ## Логи
 

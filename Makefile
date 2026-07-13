@@ -1,5 +1,5 @@
 .PHONY: help env db up down down-v logs mysql migrate app-logs backup restore backups \
-	beget-up beget-down beget-logs beget-deploy beget-native-deploy beget-native-stop
+	beget-up beget-down beget-logs beget-deploy beget-native
 
 VENV     := .venv
 COMPOSE  := docker compose --env-file .env -f deploy/docker-compose.yml
@@ -62,11 +62,8 @@ beget-logs: ## логи app на Beget
 beget-deploy: ## деплoy VPS (Docker)
 	bash scripts/deploy-beget.sh
 
-beget-native-deploy: ## деплой shared Beget (pip --user, без Docker/venv)
+beget-native: ## Beget shared: запуск/остановка (make beget-native / make beget-native-stop)
 	bash scripts/deploy-beget-native.sh
 
-beget-native-stop: ## остановить native-процесс
-	bash scripts/stop-beget-native.sh
-
-beget-check: ## проверка окружения Beget shared
-	bash scripts/check-beget.sh
+beget-native-stop:
+	bash scripts/deploy-beget-native.sh stop

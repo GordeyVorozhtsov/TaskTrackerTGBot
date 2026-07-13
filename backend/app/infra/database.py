@@ -18,7 +18,7 @@ class Base(DeclarativeBase):
 
 
 def engine_options(settings: Settings) -> dict[str, Any]:
-    """Shared SQLAlchemy engine kwargs for runtime and Alembic (aiomysql)."""
+    """SQLAlchemy engine kwargs для runtime (пул соединений)."""
     return {
         "echo": False,
         "pool_pre_ping": True,
@@ -26,6 +26,15 @@ def engine_options(settings: Settings) -> dict[str, Any]:
         "max_overflow": settings.db_max_overflow,
         "pool_timeout": settings.db_pool_timeout,
         "pool_recycle": settings.db_pool_recycle,
+        "connect_args": {
+            "connect_timeout": settings.db_connect_timeout,
+        },
+    }
+
+
+def alembic_engine_options(settings: Settings) -> dict[str, Any]:
+    """Engine kwargs для Alembic CLI (NullPool — без параметров пула)."""
+    return {
         "connect_args": {
             "connect_timeout": settings.db_connect_timeout,
         },
