@@ -6,7 +6,6 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-export BEGET_ROOT_DIR="$ROOT"
 
 PID_FILE="$ROOT/data/app.pid"
 LOG_FILE="$ROOT/data/logs/uvicorn.stdout.log"
@@ -52,16 +51,30 @@ _start() {
   _stop 2>/dev/null || true
 
   echo "==> Запуск :${PORT}..."
-  nohup "$PYTHON" -m uvicorn app.main:app --host "$HOST" --port "$PORT" --app-dir backend >>"$LOG_FILE" 2>&1 &
+  # Миграции уже выполнены выше — не дублировать при старте uvicorn
+  MIGRATE_ON_START=false nohup "$PYTHON" -m uvicorn app.main:app \
+    --host "$HOST" --port "$PORT" --app-dir backend >>"$LOG_FILE" 2>&1 &
   echo $! >"$PID_FILE"
-  sleep 4
 
-  curl -sf "http://${HOST}:${PORT}/api/health" >/dev/null || {
-    tail -30 "$LOG_FILE"
-    exit 1
-  }
-  echo "OK  http://${HOST}:${PORT}/api/health  PID $(cat "$PID_FILE")"
-  echo "Логи: tail -f data/logs/application.log"
+  for i in $(seq 1 45); do
+    sleep 2
+    if curl -sf "http://${HOST}:${PORT}/api/health" >/dev/null 2>&1; then
+      echo "OK  http://${HOST}:${PORT}/api/health  PID $(cat "$PID_FILE")"
+      echo "Логи: tail -f data/logs/application.log"
+      exit 0
+    fi
+    if ! kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
+      echo "Процесс упал:"
+      tail -40 "$LOG_FILE"
+      tail -20 data/logs/application.log 2>/dev/null || true
+      rm -f "$PID_FILE"
+      exit 1
+    fi
+  done
+
+  echo "Не ответил за 90с:"
+  tail -40 "$LOG_FILE"
+  exit 1
 }
 
 case "${1:-start}" in

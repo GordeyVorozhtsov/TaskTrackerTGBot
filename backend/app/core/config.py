@@ -55,6 +55,8 @@ class Settings(BaseSettings):
     log_max_bytes: int = 5_242_880  # 5 MB
     log_backup_count: int = 5
 
+    migrate_on_start: bool = Field(default=True, validation_alias="MIGRATE_ON_START")
+
     @computed_field  # type: ignore[prop-decorator]
     @property
     def cors_origins(self) -> list[str]:

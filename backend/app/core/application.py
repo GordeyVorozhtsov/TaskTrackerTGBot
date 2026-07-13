@@ -78,7 +78,10 @@ class Application:
                 settings.db_max_overflow,
                 settings.db_pool_recycle,
             )
-            await self.migrations.run()
+            if settings.migrate_on_start:
+                await self.migrations.run()
+            else:
+                logger.info("Skipping startup migrations (MIGRATE_ON_START=false)")
             self.storage.uploads_dir()
 
             bot_task = None
